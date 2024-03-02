@@ -86,4 +86,43 @@ module.exports = {
       res.status(500).json(err);
     }
   },
+
+  async updateReaction(req, res) {
+    // if adding req.body should look like { "updateReactionBody": "add", "reactionBody": "some text", "username": "username"}
+    // if removing req.body should look like { "updateReactionBody": "delete", "reactionId": "lkj234h5kl23jh4213l"}
+    try {
+      const thoughtId = req.params.thoughtId;
+      const updateReactionBody = req.body.updateReactionBody;
+
+      if (updateReactionBody === "add") {
+        const thought = await Thought.findOneAndUpdate(
+          { _id: thoughtId },
+          // { $set: { friends: [...friends, friendToAdd] } }
+          { $push: { reactions: req.body } },
+          { new: true }
+        );
+        if (!thought) {
+          return res.status(404).json({ message: "No thought with that ID" });
+        }
+        res.json({ message: `updated the thought🎉`, thought });
+      }
+      if (updateReactionBody === "delete") {
+        const thought = await Thought.findOneAndUpdate(
+          { _id: thoughtId },
+          // { $set: { friends: [...friends, friendToAdd] } }
+
+          { $pull: { reactions: { reactionId: req.body.reactionId } } },
+          { new: true }
+        );
+        if (!thought) {
+          return res.status(404).json({ message: "No thought with that ID" });
+        }
+
+        res.json({ message: `deleted the reaction`, thought });
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  },
 };

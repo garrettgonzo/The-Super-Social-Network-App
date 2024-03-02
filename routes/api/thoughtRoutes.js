@@ -5,8 +5,7 @@ const {
   updateSingleThought,
   deleteSingleThought,
   createThought,
-  addTag,
-  removeTag,
+  updateReaction,
 } = require("../../controllers/thoughtController");
 
 // /api/thoughts
@@ -23,5 +22,19 @@ router
 
 // /api/applications/:applicationId/tags/:tagId
 // router.route("/:applicationId/tags/:tagId").delete(removeTag);
+router.route("/:thoughtId/reactions").put(updateReaction);
 
 module.exports = router;
+
+// {
+// 	"updateReactionBody": "add",
+// 	"reactionBody": "some text",
+// 	"username": "username"
+// }
+
+// {
+// 	"updateReactionBody": "delete",
+// 	"reactionId": "65e259706a2b0f38b64fa25d"
+// }
+
+// use reaction ID rather than underscore id

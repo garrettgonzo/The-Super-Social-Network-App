@@ -1,4 +1,4 @@
-const { User, Application } = require("../models");
+const { User } = require("../models");
 
 module.exports = {
   // Get all users
@@ -70,6 +70,50 @@ module.exports = {
       res.json({ message: "User deleted!" });
     } catch (err) {
       res.status(500).json(err);
+    }
+  },
+
+  async updateFriend(req, res) {
+    const updateFriendBody = req.body.updateFriendBody;
+    if (updateFriendBody === "add") {
+      try {
+        const userId = req.params.userId;
+        const friendToAdd = req.params.friendId;
+        const user = await User.findOneAndUpdate(
+          { _id: userId },
+          // { $set: { friends: [...friends, friendToAdd] } }
+          { $push: { friends: friendToAdd } }
+        );
+        if (!user) {
+          return res.status(404).json({ message: "No user with that ID" });
+        }
+        const newUserWithFriendAdded = await User.findOne({
+          _id: req.params.userId,
+        });
+        res.json(`updated the user ${newUserWithFriendAdded}🎉`);
+      } catch (err) {
+        res.status(500).json(err);
+      }
+    }
+    if (updateFriendBody === "delete") {
+      try {
+        const userId = req.params.userId;
+        const friendToDelete = req.params.friendId;
+        const user = await User.findOneAndUpdate(
+          { _id: userId },
+          // { $set: { friends: [...friends, friendToAdd] } }
+          { $pull: { friends: friendToDelete } }
+        );
+        if (!user) {
+          return res.status(404).json({ message: "No user with that ID" });
+        }
+        const newUserWithFriendDeleted = await User.findOne({
+          _id: req.params.userId,
+        });
+        res.json(`deleted the user ${newUserWithFriendDeleted}🎉`);
+      } catch (err) {
+        res.status(500).json(err);
+      }
     }
   },
 };
